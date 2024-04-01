@@ -1,7 +1,15 @@
-[gd_scene load_steps=3 format=3 uid="uid://dspns4d4t7ixh"]
+[gd_scene load_steps=10 format=3 uid="uid://dspns4d4t7ixh"]
 
-[ext_resource type="AudioStream" uid="uid://coyelc02wnlg8" path="res://TestMusic/07. Daft Punk - Superheroes.mp3" id="1_0181a"]
 [ext_resource type="Script" path="res://Scenes/gui.gd" id="1_eej5p"]
+[ext_resource type="Texture2D" uid="uid://b41p5ynsw1erb" path="res://Textures/Back.png" id="2_24nlt"]
+[ext_resource type="Texture2D" uid="uid://ccnu67bxh25mt" path="res://Textures/Previous.png" id="3_jh0dt"]
+[ext_resource type="Texture2D" uid="uid://c6gh0d6ax3kea" path="res://Textures/Play.png" id="4_ysirp"]
+[ext_resource type="Texture2D" uid="uid://cfl88l3dl2tr6" path="res://Textures/Stop.png" id="5_q1pnj"]
+[ext_resource type="Texture2D" uid="uid://0o1wpxyuq5gv" path="res://Textures/Next.png" id="6_n45te"]
+[ext_resource type="Texture2D" uid="uid://ble5e2ampvsyg" path="res://Textures/Forward.png" id="7_xjuan"]
+[ext_resource type="Texture2D" uid="uid://ydqj8u81sx2c" path="res://Textures/Shuffle.png" id="8_jmehw"]
+
+[sub_resource type="AudioStream" id="AudioStream_cgx82"]
 
 [node name="GUI" type="Control"]
 layout_mode = 3
@@ -19,11 +27,131 @@ offset_bottom = 1080.0
 color = Color(0.137255, 0.152941, 0.192157, 1)
 
 [node name="SongPlayer" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("1_0181a")
+stream = SubResource("AudioStream_cgx82")
+volume_db = -30.0
 
 [node name="SongList" type="ItemList" parent="."]
 layout_mode = 0
+offset_top = 346.0
 offset_right = 1920.0
 offset_bottom = 1080.0
 
+[node name="Controls" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 19.0
+offset_top = 97.0
+offset_right = 755.0
+offset_bottom = 297.0
+color = Color(0, 0, 0, 1)
+
+[node name="Slider" type="HSlider" parent="Controls"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 177.0
+offset_right = 418.0
+offset_bottom = 193.0
+max_value = 250.0
+value = 70.0
+
+[node name="Percent" type="Label" parent="Controls/Slider"]
+layout_mode = 0
+offset_left = -59.0
+offset_top = -5.0
+offset_right = -17.0
+offset_bottom = 18.0
+text = "70%"
+
+[node name="SongName" type="Label" parent="Controls"]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 105.0
+offset_bottom = 26.0
+text = "None playing"
+
+[node name="TimeLeft" type="ProgressBar" parent="Controls"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 33.0
+offset_right = 345.0
+offset_bottom = 60.0
+max_value = 60.0
+show_percentage = false
+
+[node name="Left" type="Label" parent="Controls/TimeLeft"]
+layout_direction = 3
+layout_mode = 0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 70.0
+offset_bottom = 24.0
+text = "0h 0m 0s"
+
+[node name="Length" type="Label" parent="Controls/TimeLeft"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "0h 0m 0s"
+
+[node name="Buttons" type="ColorRect" parent="Controls"]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 68.0
+offset_right = 217.0
+offset_bottom = 173.0
+color = Color(0.356863, 0.356863, 0.356863, 1)
+
+[node name="Container" type="HBoxContainer" parent="Controls/Buttons"]
+layout_direction = 2
+layout_mode = 0
+offset_left = 1.0
+offset_top = 64.0
+offset_right = 213.0
+offset_bottom = 104.0
+
+[node name="Back" type="TextureButton" parent="Controls/Buttons/Container"]
+texture_filter = 1
+layout_mode = 2
+texture_normal = ExtResource("2_24nlt")
+
+[node name="Previous" type="TextureButton" parent="Controls/Buttons/Container"]
+texture_filter = 1
+layout_mode = 2
+texture_normal = ExtResource("3_jh0dt")
+
+[node name="Play" type="TextureButton" parent="Controls/Buttons/Container"]
+texture_filter = 1
+layout_mode = 2
+texture_normal = ExtResource("4_ysirp")
+
+[node name="Stop" type="TextureButton" parent="Controls/Buttons/Container"]
+texture_filter = 1
+layout_mode = 2
+texture_normal = ExtResource("5_q1pnj")
+
+[node name="Next" type="TextureButton" parent="Controls/Buttons/Container"]
+texture_filter = 1
+layout_mode = 2
+texture_normal = ExtResource("6_n45te")
+
+[node name="Forward" type="TextureButton" parent="Controls/Buttons/Container"]
+texture_filter = 1
+layout_mode = 2
+texture_normal = ExtResource("7_xjuan")
+
+[node name="Shuffle" type="CheckButton" parent="Controls/Buttons"]
+texture_filter = 1
+layout_mode = 0
+offset_left = -3.0
+offset_top = 14.0
+offset_right = 73.0
+offset_bottom = 54.0
+icon = ExtResource("8_jmehw")
+
+[connection signal="finished" from="SongPlayer" to="." method="_on_song_player_finished"]
 [connection signal="item_activated" from="SongList" to="." method="_on_song_list_item_activated"]
+[connection signal="gui_input" from="Controls" to="." method="_on_controls_gui_input"]
+[connection signal="gui_input" from="Controls/Slider" to="." method="_on_slider_gui_input"]
+[connection signal="pressed" from="Controls/Buttons/Container/Play" to="." method="_on_play_pressed"]
+[connection signal="pressed" from="Controls/Buttons/Container/Stop" to="." method="_on_stop_pressed"]
+[connection signal="pressed" from="Controls/Buttons/Container/Next" to="." method="_on_next_pressed"]
