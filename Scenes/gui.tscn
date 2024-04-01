@@ -1,0 +1,29 @@
+[gd_scene load_steps=3 format=3 uid="uid://dspns4d4t7ixh"]
+
+[ext_resource type="AudioStream" uid="uid://coyelc02wnlg8" path="res://TestMusic/07. Daft Punk - Superheroes.mp3" id="1_0181a"]
+[ext_resource type="Script" path="res://Scenes/gui.gd" id="1_eej5p"]
+
+[node name="GUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_eej5p")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+color = Color(0.137255, 0.152941, 0.192157, 1)
+
+[node name="SongPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("1_0181a")
+
+[node name="SongList" type="ItemList" parent="."]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+
+[connection signal="item_activated" from="SongList" to="." method="_on_song_list_item_activated"]
