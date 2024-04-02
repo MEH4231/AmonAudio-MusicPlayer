@@ -1,6 +1,9 @@
 # Godot 4+ specific ignores
 .godot/
-CustomEditor/GodotEditorCustom.exe
-CustomEditor/GodotTemplateCustom.exe
+CustomEditor/GodotEditorCustomLinux.x86_64
+CustomEditor/GodotEditorCustomWindows.exe
+CustomEditor/GodotTemplateCustomLinux.x86_64
+CustomEditor/GodotTemplateCustomWindows.exe
 /TestMusic
 Music-player.exe
+Music-player.x86_64

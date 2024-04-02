@@ -36,6 +36,13 @@ offset_top = 346.0
 offset_right = 1920.0
 offset_bottom = 1080.0
 
+[node name="History" type="ItemList" parent="."]
+layout_mode = 0
+offset_left = 937.0
+offset_top = 27.0
+offset_right = 1701.0
+offset_bottom = 322.0
+
 [node name="Controls" type="ColorRect" parent="."]
 layout_mode = 0
 offset_left = 19.0
@@ -44,16 +51,16 @@ offset_right = 755.0
 offset_bottom = 297.0
 color = Color(0, 0, 0, 1)
 
-[node name="Slider" type="HSlider" parent="Controls"]
+[node name="VolumeSlider" type="HSlider" parent="Controls"]
 layout_mode = 0
 offset_left = 64.0
 offset_top = 177.0
 offset_right = 418.0
 offset_bottom = 193.0
-max_value = 250.0
+max_value = 150.0
 value = 70.0
 
-[node name="Percent" type="Label" parent="Controls/Slider"]
+[node name="Percent" type="Label" parent="Controls/VolumeSlider"]
 layout_mode = 0
 offset_left = -59.0
 offset_top = -5.0
@@ -148,10 +155,22 @@ offset_right = 73.0
 offset_bottom = 54.0
 icon = ExtResource("8_jmehw")
 
+[node name="SelectSongs" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1789.0
+offset_top = 238.0
+offset_right = 1896.0
+offset_bottom = 269.0
+text = "Select Folder"
+
 [connection signal="finished" from="SongPlayer" to="." method="_on_song_player_finished"]
 [connection signal="item_activated" from="SongList" to="." method="_on_song_list_item_activated"]
 [connection signal="gui_input" from="Controls" to="." method="_on_controls_gui_input"]
-[connection signal="gui_input" from="Controls/Slider" to="." method="_on_slider_gui_input"]
+[connection signal="gui_input" from="Controls/VolumeSlider" to="." method="_on_volume_slider_gui_input"]
+[connection signal="pressed" from="Controls/Buttons/Container/Back" to="." method="_on_back_pressed"]
+[connection signal="pressed" from="Controls/Buttons/Container/Previous" to="." method="_on_previous_pressed"]
 [connection signal="pressed" from="Controls/Buttons/Container/Play" to="." method="_on_play_pressed"]
 [connection signal="pressed" from="Controls/Buttons/Container/Stop" to="." method="_on_stop_pressed"]
 [connection signal="pressed" from="Controls/Buttons/Container/Next" to="." method="_on_next_pressed"]
+[connection signal="pressed" from="Controls/Buttons/Container/Forward" to="." method="_on_forward_pressed"]
+[connection signal="toggled" from="Controls/Buttons/Shuffle" to="." method="_on_shuffle_toggled"]
