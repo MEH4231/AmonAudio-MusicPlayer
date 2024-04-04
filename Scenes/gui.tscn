@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://dspns4d4t7ixh"]
+[gd_scene load_steps=12 format=3 uid="uid://dspns4d4t7ixh"]
 
 [ext_resource type="Script" path="res://Scenes/gui.gd" id="1_eej5p"]
 [ext_resource type="Texture2D" uid="uid://b41p5ynsw1erb" path="res://Textures/Back.png" id="2_24nlt"]
@@ -8,6 +8,8 @@
 [ext_resource type="Texture2D" uid="uid://0o1wpxyuq5gv" path="res://Textures/Next.png" id="6_n45te"]
 [ext_resource type="Texture2D" uid="uid://ble5e2ampvsyg" path="res://Textures/Forward.png" id="7_xjuan"]
 [ext_resource type="Texture2D" uid="uid://ydqj8u81sx2c" path="res://Textures/Shuffle.png" id="8_jmehw"]
+[ext_resource type="Texture2D" uid="uid://clinmb7oquv8p" path="res://Textures/Loop.png" id="9_oyepu"]
+[ext_resource type="Texture2D" uid="uid://msa6nnsu7wcj" path="res://Textures/Loop1.png" id="10_bnngr"]
 
 [sub_resource type="AudioStream" id="AudioStream_0rjxe"]
 
@@ -155,6 +157,25 @@ offset_right = 73.0
 offset_bottom = 54.0
 icon = ExtResource("8_jmehw")
 
+[node name="Loop" type="CheckButton" parent="Controls/Buttons"]
+texture_filter = 1
+layout_mode = 0
+offset_left = 82.0
+offset_top = 15.0
+offset_right = 158.0
+offset_bottom = 55.0
+icon = ExtResource("9_oyepu")
+
+[node name="One" type="TextureRect" parent="Controls/Buttons/Loop"]
+visible = false
+layout_mode = 0
+offset_left = 6.0
+offset_top = 4.0
+offset_right = 46.0
+offset_bottom = 44.0
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("10_bnngr")
+
 [node name="Discord" type="CheckButton" parent="."]
 layout_mode = 0
 offset_left = 1797.0
@@ -202,6 +223,7 @@ use_native_dialog = true
 [connection signal="pressed" from="Controls/Buttons/Container/Next" to="." method="_on_next_pressed"]
 [connection signal="pressed" from="Controls/Buttons/Container/Forward" to="." method="_on_forward_pressed"]
 [connection signal="toggled" from="Controls/Buttons/Shuffle" to="." method="_on_shuffle_toggled"]
+[connection signal="pressed" from="Controls/Buttons/Loop" to="." method="_on_loop_pressed"]
 [connection signal="toggled" from="Discord" to="." method="_on_discord_toggled"]
 [connection signal="pressed" from="ClearList" to="." method="_on_clear_list_pressed"]
 [connection signal="pressed" from="SelectSongs" to="." method="_on_select_songs_pressed"]

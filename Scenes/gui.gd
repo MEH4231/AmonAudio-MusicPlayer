@@ -1,9 +1,16 @@
 extends Control
 
 var SongList = []
-var Shuffle = false
-var PlayingSong = []
 var PreviousSongs = []
+var PlayingSong = []
+
+var Shuffle = false
+var Loop = LoopType.OFF
+enum LoopType{
+	OFF,
+	ON,
+	SINGLE
+}
 
 var Discord = true
 
@@ -21,7 +28,7 @@ func _ready():
 	#DiscordRPC.start_timestamp = int(Time.get_unix_time_from_system())
 	#DiscordRPC.end_timestamp = int(Time.get_unix_time_from_system()) + 3600 # +1 hour in unix time / "01:00:00 remaining"
 	DiscordRPC.refresh()
-	
+	GetDirectories("C:/Users/XLR8/Documents/Godot/projects/AmonAudio-MusicPlayer/TestMusic")
 	#GetDirectories("C:/Users/XLR8/Music/")
 	#GetDirectories("/run/media/kirby/MoreStore/Music")
 	print(SongList.size())
@@ -71,19 +78,47 @@ func _on_song_list_item_activated(index):
 var LastDiscordTime = Time.get_unix_time_from_system()
 
 func LoadSong(SongNumber: int, Forward: bool):
-	if Time.get_unix_time_from_system() > LastDiscordTime + 60:
-		DiscordRPC.clear(true)
-		DiscordRPC.app_id = 1224614529456017498
-		DiscordRPC.details = "Playing " + str(SongList.size()) + " songs all night"
-		DiscordRPC.state = "Nothing Playing"
-		DiscordRPC.large_image = "icon"
-		DiscordRPC.small_image = "volume"
-		LastDiscordTime = Time.get_unix_time_from_system()
+	if Discord == true:
+		if Time.get_unix_time_from_system() > LastDiscordTime + 60:
+			DiscordRPC.clear(true)
+			DiscordRPC.app_id = 1224614529456017498
+			DiscordRPC.details = "Playing " + str(SongList.size()) + " songs all night"
+			DiscordRPC.state = "Nothing Playing"
+			DiscordRPC.large_image = "icon"
+			DiscordRPC.small_image = "volume"
+			LastDiscordTime = Time.get_unix_time_from_system()
 	
 	if SongNumber > SongList.size() - 1 or SongNumber < 0:
-		SongNumber = 0
-	var SelectedSong = SongList[SongNumber]
-	
+		$SongPlayer.stop()
+		$SongPlayer.stream = AudioStream.new()
+		$Controls/SongName.text = "None playing"
+		$Controls/Buttons/Container/Play.texture_normal = ResourceLoader.load("res://Textures/Play.png")
+		$Controls/TimeLeft/Length.text = "0h 0m 0s"
+		$Controls/TimeLeft/Left.text = "0h 0m 0s"
+		$Controls/TimeLeft.value = 0
+		
+		if PlayingSong.size() > 0:
+			if Forward == true:
+				PreviousSongs.insert(0,PlayingSong.duplicate())
+				if PreviousSongs.size() > 250:
+					PreviousSongs.remove_at(250)
+			elif Forward == false:
+				if PreviousSongs.size() > 0:
+					PreviousSongs.remove_at(0)
+		$History.clear()
+		for Song in PreviousSongs:
+			$History.add_item(Song[0])
+		PlayingSong.clear()
+		
+		DiscordRPC.state = "Nothing Playing"
+		DiscordRPC.start_timestamp = int()
+		DiscordRPC.large_image_text = ""
+		DiscordRPC.refresh()
+		if Loop == LoopType.ON:
+			LoadSong(0, true)
+			#LastRefresh = snapped(-1, 1)
+		return
+	var SelectedSong = SongList[SongNumber].duplicate()
 	var MusicStream
 	if SelectedSong[2] == "mp3":
 		var Song = FileAccess.open(SelectedSong[1], FileAccess.READ)
@@ -107,9 +142,9 @@ func LoadSong(SongNumber: int, Forward: bool):
 			#NewFile.append(Byte)
 	#print(NewFile)
 	
-	#File = FileAccess.open(SelectedSong[1],FileAccess.READ)
+	var File = FileAccess.open(SelectedSong[1],FileAccess.READ)
 	#File = File.get_buffer(3).get_string_from_ascii()
-	#print(File.get_buffer(30).get_string_from_ascii())
+	print(File.get_buffer(128).get_string_from_ascii())
 	#if File[0] == 'I' and File[1] == 'D' and File[2] == '3':
 		#print("File")
 	
@@ -122,7 +157,7 @@ func LoadSong(SongNumber: int, Forward: bool):
 	
 	if PlayingSong.size() > 0:
 		if Forward == true:
-			PreviousSongs.insert(0,PlayingSong)
+			PreviousSongs.insert(0,PlayingSong.duplicate())
 			if PreviousSongs.size() > 250:
 				PreviousSongs.remove_at(250)
 		elif Forward == false:
@@ -131,9 +166,8 @@ func LoadSong(SongNumber: int, Forward: bool):
 	$History.clear()
 	for Song in PreviousSongs:
 		$History.add_item(Song[0])
-		
 	
-	PlayingSong = SongList[SongNumber]
+	PlayingSong = SongList[SongNumber].duplicate()
 	
 	$Controls/Buttons/Container/Play.texture_normal = ResourceLoader.load("res://Textures/Pause.png")
 	$SongList.select(SongNumber)
@@ -158,6 +192,8 @@ func LoadSong(SongNumber: int, Forward: bool):
 	DiscordRPC.small_image_text = "Volume: " + str($Controls/VolumeSlider.value)
 	DiscordRPC.refresh()
 
+func GetMetaMp3():
+	pass
 
 func _on_volume_slider_gui_input(_event):
 	$SongPlayer.volume_db = ($Controls/VolumeSlider.value -100)
@@ -168,12 +204,17 @@ func _on_volume_slider_gui_input(_event):
 
 
 func _on_song_player_finished():
-	if Shuffle == true:
-		var random = RandomNumberGenerator.new()
-		random.randomize()
-		LoadSong(random.randi_range(1,SongList.size()) - 1, true)
+	if Loop == LoopType.SINGLE:
+		$SongPlayer.seek(0)
+		$SongPlayer.play()
+		LastRefresh = snapped(-1, 1)
 	else:
-		LoadSong($SongList.get_selected_items()[0] + 1, true)
+		if Shuffle == true:
+			var random = RandomNumberGenerator.new()
+			random.randomize()
+			LoadSong(random.randi_range(1,SongList.size()) - 1, true)
+		else:
+			LoadSong($SongList.get_selected_items()[0] + 1, true)
 
 
 func _on_play_pressed():
@@ -215,6 +256,9 @@ func _on_stop_pressed():
 	$Controls/SongName.text = "None playing"
 	$Controls/Buttons/Container/Play.texture_normal = ResourceLoader.load("res://Textures/Play.png")
 	$Controls/TimeLeft/Length.text = "0h 0m 0s"
+	$Controls/TimeLeft/Left.text = "0h 0m 0s"
+	$Controls/TimeLeft.value = 0
+	PlayingSong.clear()
 	
 	DiscordRPC.state = "Nothing Playing"
 	DiscordRPC.start_timestamp = int()
@@ -248,7 +292,7 @@ func _on_previous_pressed():
 
 func _on_forward_pressed():
 	$SongPlayer.seek($SongPlayer.get_playback_position() + 10)
-	LastRefresh = snapped(0, 1)
+	LastRefresh = snapped(-1, 1)
 	DiscordRPC.start_timestamp = int(Time.get_unix_time_from_system() - $SongPlayer.get_playback_position())
 	DiscordRPC.refresh()
 
@@ -310,11 +354,14 @@ func _on_folder_select_dir_selected(dir):
 	for Song in SongList:
 		$SongList.add_item(Song[0])
 	print(SongList.size())
+	DiscordRPC.details = "Playing " + str(SongList.size()) + " songs all night"
+	DiscordRPC.refresh()
 
 
 func _on_clear_list_pressed():
 	SongList.clear()
 	PreviousSongs.clear()
+	PlayingSong.clear()
 	
 	$History.clear()
 	$SongList.clear()
@@ -323,8 +370,25 @@ func _on_clear_list_pressed():
 	$Controls/SongName.text = "None playing"
 	$Controls/Buttons/Container/Play.texture_normal = ResourceLoader.load("res://Textures/Play.png")
 	$Controls/TimeLeft/Length.text = "0h 0m 0s"
+	$Controls/TimeLeft/Left.text = "0h 0m 0s"
+	$Controls/TimeLeft.value = 0
 	
 	DiscordRPC.state = "Nothing Playing"
 	DiscordRPC.start_timestamp = int()
 	DiscordRPC.large_image_text = ""
 	DiscordRPC.refresh()
+
+
+func _on_loop_pressed():
+	if Loop == LoopType.OFF:
+		Loop = LoopType.ON
+		$Controls/Buttons/Loop.button_pressed = true
+		$Controls/Buttons/Loop/One.visible = false
+	elif Loop == LoopType.ON:
+		Loop = LoopType.SINGLE
+		$Controls/Buttons/Loop.button_pressed = true
+		$Controls/Buttons/Loop/One.visible = true
+	elif Loop == LoopType.SINGLE:
+		Loop = LoopType.OFF
+		$Controls/Buttons/Loop.button_pressed = false
+		$Controls/Buttons/Loop/One.visible = false
