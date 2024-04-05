@@ -181,7 +181,7 @@ func LoadSong(SongNumber: int, Forward: bool):
 	$SongList.ensure_current_is_visible()
 	#$Controls/SongName.text = SelectedSong[0]
 	if PlayingSong[4].get("TIT2") and PlayingSong[4].get("TPE1"):
-		$Controls/SongName.text = PlayingSong[4].get("TIT2") + " - " + PlayingSong[4].get("TPE1")
+		$Controls/SongName.text = PlayingSong[4].get("TPE1") + " - " + PlayingSong[4].get("TIT2")
 	else:
 		$Controls/SongName.text = SelectedSong[0]
 	$Controls/TimeLeft.max_value = MusicStream.get_length()
@@ -202,7 +202,7 @@ func LoadSong(SongNumber: int, Forward: bool):
 		DiscordRPC.start_timestamp = int(Time.get_unix_time_from_system())
 		#DiscordRPC.large_image_text = SelectedSong[0]
 		if PlayingSong[4].get("TIT2") and PlayingSong[4].get("TPE1"):
-			DiscordRPC.large_image_text = PlayingSong[4].get("TIT2") + " - " + PlayingSong[4].get("TPE1")
+			DiscordRPC.large_image_text = PlayingSong[4].get("TPE1") + " - " + PlayingSong[4].get("TIT2")
 		else:
 			DiscordRPC.large_image_text = PlayingSong[0]
 		DiscordRPC.small_image_text = "Volume: " + str($Controls/VolumeSlider.value)
@@ -215,7 +215,43 @@ func GetMetaMp3():
 			SongList[Song[3]][4] = Mp3Metadata.SongInfo
 			print(Song[3])
 		#print(Mp3Metadata.SongInfo)
+	call_deferred("SongListName")
+	#if call_deferred("get_node_or_null","SongList"):
+		#$SongList.clear()
+		#return
+	#for Song in SongList:
+		#print(Song[0])
+		#if Song[4]:
+			#print("a")
+			#if Song[4].get("TIT2") and Song[4].get("TPE1"):
+				#print(Song[4].get("TIT2") + " - " + Song[4].get("TPE1"))
+				#SongListName(Song[4].get("TIT2") + " - " + Song[4].get("TPE1"))
+				##if call_deferred("get_node_or_null","SongList"):
+					##$SongList.add_item(Song[4].get("TIT2") + " - " + Song[4].get("TPE1"))
+		#else:
+			#print("b")
+			#$SongList.add_item(Song[0])
 	print("Done")
+
+func SongListName():
+	$SongList.clear()
+	for Song in SongList:
+		print(Song[0])
+		if Song[4]:
+			print("a")
+			if Song[4].get("TPE1") and Song[4].get("TIT2"):
+				print(Song[4].get("TPE1") + " - " + Song[4].get("TIT2"))
+				$SongList.add_item(Song[4].get("TPE1") + " - " + Song[4].get("TIT2"))
+				#if call_deferred("get_node_or_null","SongList"):
+					#$SongList.add_item(Song[4].get("TIT2") + " - " + Song[4].get("TPE1"))
+			else:
+				print("b")
+				$SongList.add_item(Song[0])
+		else:
+			print("b")
+			$SongList.add_item(Song[0])
+	
+	
 
 func _on_volume_slider_gui_input(_event):
 	$SongPlayer.volume_db = ($Controls/VolumeSlider.value -100)
@@ -257,7 +293,7 @@ func _on_play_pressed():
 				DiscordRPC.state = "Total: "+ (str(hours) + "h " + str(mins) + "m " + str(secs) + "s")
 				DiscordRPC.start_timestamp = int(Time.get_unix_time_from_system() - $SongPlayer.get_playback_position())
 				if PlayingSong[4].get("TIT2") and PlayingSong[4].get("TPE1"):
-					DiscordRPC.large_image_text = PlayingSong[4].get("TIT2") + " - " + PlayingSong[4].get("TPE1")
+					DiscordRPC.large_image_text = PlayingSong[4].get("TPE1") + " - " + PlayingSong[4].get("TIT2")
 				else:
 					DiscordRPC.large_image_text = PlayingSong[0]
 		elif $SongPlayer.playing == false:
@@ -267,7 +303,7 @@ func _on_play_pressed():
 				DiscordRPC.state = "Paused"
 				DiscordRPC.start_timestamp = int()
 				if PlayingSong[4].get("TIT2") and PlayingSong[4].get("TPE1"):
-					DiscordRPC.large_image_text = PlayingSong[4].get("TIT2") + " - " + PlayingSong[4].get("TPE1")
+					DiscordRPC.large_image_text = PlayingSong[4].get("TPE1") + " - " + PlayingSong[4].get("TIT2")
 				else:
 					DiscordRPC.large_image_text = PlayingSong[0]
 	else:
@@ -369,8 +405,8 @@ func _on_discord_toggled(toggled_on):
 			DiscordRPC.state = "Total: "+ (str(hours) + "h " + str(mins) + "m " + str(secs) + "s")
 			DiscordRPC.start_timestamp = int(Time.get_unix_time_from_system() - $SongPlayer.get_playback_position())
 			#DiscordRPC.large_image_text = PlayingSong[0]
-			if PlayingSong[4].get("TIT2") and PlayingSong[4].get("TPE1"):
-				DiscordRPC.large_image_text = PlayingSong[4].get("TIT2") + " - " + PlayingSong[4].get("TPE1")
+			if PlayingSong[4].get("TPE1") and PlayingSong[4].get("TIT2"):
+				DiscordRPC.large_image_text = PlayingSong[4].get("TPE1") + " - " + PlayingSong[4].get("TIT2")
 			else:
 				DiscordRPC.large_image_text = PlayingSong[0]
 			DiscordRPC.small_image_text = "Volume: " + str($Controls/VolumeSlider.value)
