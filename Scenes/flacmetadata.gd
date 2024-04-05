@@ -16,12 +16,22 @@ enum TagEncoding {
 	UTF_16_WITHOUT_BOM = 2, # assuming big endian
 	UTF8 = 3
 };
-
+func _ready():
+	OpenFile("res://TestMusic/Frizk - ALL MY FELLAS.flac")
 func OpenFile(filepath):
 	MoreTags = true
 	SongInfo = Dictionary()
 	file = FileAccess.open(filepath, FileAccess.READ)
+	file = FileAccess.open("res://TestMusic/MetadataTest/Ariana Grande - 7 rings.flac", FileAccess.READ)
 	file.set_big_endian(true)
+	print(file.get_buffer(5).get_string_from_ascii())
+	file.seek(7)
+	for num in 5000:
+		file.seek(num)
+		print(str(num) + ": " + file.get_buffer(1).get_string_from_ascii())
+	file.seek(626)
+	print(file.get_buffer(16).get_string_from_ascii())
+	return
 	#First we search for the 10 byte ID3 tag header
 	#ID3 tags are supposed to, but don't always, prepend the music data in the file
 	if file.get_buffer(3).get_string_from_utf8().contains("ID3"):
@@ -51,7 +61,7 @@ func OpenFile(filepath):
 	while MoreTags:
 		TagLoad()
 		
-	#print(SongInfo)
+	print(SongInfo)
 
 var converted = 0
 var magic = 0x7F000000
