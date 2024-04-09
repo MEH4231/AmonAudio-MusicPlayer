@@ -17,6 +17,7 @@ var Discord = true
 var MetadataThread = Thread.new()
 
 func _ready():
+	print(Loop)
 	DiscordRPC.app_id = 1224614529456017498 # Application ID
 	DiscordRPC.details = "Playing music all night"
 	DiscordRPC.state = "Nothing Playing"
@@ -172,7 +173,15 @@ func LoadSong(SongNumber: int, Forward: bool):
 				PreviousSongs.remove_at(0)
 	$History.clear()
 	for Song in PreviousSongs:
-		$History.add_item(Song[0])
+		if Song[4]:
+			if Song[4].get("TPE1") and Song[4].get("TIT2"):
+				$History.add_item(Song[4].get("TPE1") + " - " + Song[4].get("TIT2"))
+				#if call_deferred("get_node_or_null","SongList"):
+					#$SongList.add_item(Song[4].get("TIT2") + " - " + Song[4].get("TPE1"))
+			else:
+				$History.add_item(Song[0])
+		else:
+			$History.add_item(Song[0])
 	
 	PlayingSong = SongList[SongNumber].duplicate()
 	
@@ -210,10 +219,10 @@ func LoadSong(SongNumber: int, Forward: bool):
 
 func GetMetaMp3():
 	for Song in SongList:
-		if Song[2] == "mp3":
-			Mp3Metadata.OpenFile(Song[1])
-			SongList[Song[3]][4] = Mp3Metadata.SongInfo
-			print(Song[3])
+		if Song:
+			if Song[2] == "mp3":
+				Mp3Metadata.OpenFile(Song[1])
+				SongList[Song[3]][4] = Mp3Metadata.SongInfo
 		#print(Mp3Metadata.SongInfo)
 	call_deferred("SongListName")
 	#if call_deferred("get_node_or_null","SongList"):
@@ -236,19 +245,14 @@ func GetMetaMp3():
 func SongListName():
 	$SongList.clear()
 	for Song in SongList:
-		print(Song[0])
 		if Song[4]:
-			print("a")
 			if Song[4].get("TPE1") and Song[4].get("TIT2"):
-				print(Song[4].get("TPE1") + " - " + Song[4].get("TIT2"))
 				$SongList.add_item(Song[4].get("TPE1") + " - " + Song[4].get("TIT2"))
 				#if call_deferred("get_node_or_null","SongList"):
 					#$SongList.add_item(Song[4].get("TIT2") + " - " + Song[4].get("TPE1"))
 			else:
-				print("b")
 				$SongList.add_item(Song[0])
 		else:
-			print("b")
 			$SongList.add_item(Song[0])
 	
 	
@@ -427,8 +431,6 @@ func _on_select_songs_pressed():
 
 func _on_folder_select_dir_selected(dir):
 	GetDirectories(dir)
-	MetadataThread = Thread.new()
-	MetadataThread.start(GetMetaMp3)
 	$SongList.clear()
 	for Song in SongList:
 		$SongList.add_item(Song[0])
@@ -437,6 +439,9 @@ func _on_folder_select_dir_selected(dir):
 	if Discord == true:
 		DiscordRPC.details = "Playing " + str(SongList.size()) + " songs all night"
 		DiscordRPC.refresh()
+	
+	MetadataThread = Thread.new()
+	MetadataThread.start(GetMetaMp3)
 
 
 func _on_clear_list_pressed():
@@ -444,7 +449,6 @@ func _on_clear_list_pressed():
 	PreviousSongs.clear()
 	PlayingSong.clear()
 	
-	MetadataThread = Thread.new()
 	
 	$History.clear()
 	$SongList.clear()
