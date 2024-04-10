@@ -19,6 +19,7 @@ enum TagEncoding {
 func _ready():
 	return
 	OpenFile("res://TestMusic/Frizk - ALL MY FELLAS.flac")
+
 func OpenFile(filepath):
 	MoreTags = true
 	SongInfo = Dictionary()

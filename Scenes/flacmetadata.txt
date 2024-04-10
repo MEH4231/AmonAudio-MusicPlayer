@@ -1,0 +1,52 @@
+import struct
+
+def extract_flac_title(flac_file):
+	with open(flac_file, 'rb') as f:
+		header = f.read(4)
+		if header != b'fLaC':
+			print("Not a valid FLAC file.")
+			return None
+		
+		metadata = []
+
+		while True:
+			block_header = f.read(4)
+			if not block_header:
+				break 
+			block_type = block_header[0] & 0x7F
+
+			block_length = struct.unpack('>I', b'\x00' + block_header[1:])[0]
+
+			if block_type == 4:
+				comment_data = f.read(block_length)
+
+				artist_index = comment_data.lower().find(b'artist=')
+				if artist_index != -1:
+					artist_end_index = comment_data.find(b'\x00', artist_index)
+					artist = comment_data[artist_index + len(b'artist='):artist_end_index].decode('utf-8')
+					metadata.append(artist)
+
+				title_index = comment_data.lower().find(b'title=')
+				if title_index != -1:
+					title_end_index = comment_data.find(b'\x00', title_index)  
+					title = comment_data[title_index + len(b'title='):title_end_index].decode('utf-8')
+					metadata.append(title)
+
+				album_index = comment_data.lower().find(b'album=')
+				if title_index != -1:
+					album_end_index = comment_data.find(b'\x00', album_index)
+					album = comment_data[album_index + len(b'album='):album_end_index].decode('utf-8')
+					metadata.append(album)
+
+			f.seek(block_length, 1)
+		return metadata
+
+flac_file = 'c2c.flac'
+metadata = extract_flac_title(flac_file)
+if metadata:
+	print("Artist:", metadata[0][:-1])
+	print("Title:", metadata[1][:-1])
+	print("Album:", metadata[2][:-1])
+
+else:
+	print("No metadata found")
