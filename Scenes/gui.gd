@@ -37,7 +37,7 @@ func _ready():
 	print(SongList.size())
 	DiscordRPC.details = "Playing " + str(SongList.size()) + " songs all night"
 	DiscordRPC.refresh()
-	MetadataThread.start(GetMetaMp3)
+	MetadataThread.start(GetMeta)
 	for Song in SongList:
 		$SongList.add_item(Song[0])
 
@@ -68,7 +68,7 @@ func GetDirectories(Path: String):
 				#print(File)
 				var NewFile = File.erase(File.length() - (File.get_extension().length() + 1),File.get_extension().length() + 1)
 				#print(NewFile)
-				SongList.append([NewFile, Path + "/" + File, File.get_extension(), SongList.size(),Mp3Metadata.SongInfo])
+				SongList.append([NewFile, Path + "/" + File, File.get_extension(), SongList.size(),{}])
 				#print(File.get_extension())0
 				#if File.ends_with(".mp3"):
 					#SongList.append([File, Path + "/" + File, "mp3", SongList.size()])
@@ -152,12 +152,21 @@ func LoadSong(SongNumber: int, Forward: bool):
 	#print(File.get_buffer(128).get_string_from_ascii())
 	#if File[0] == 'I' and File[1] == 'D' and File[2] == '3':
 		#print("File")
+	print("bas")
 	if SongList[SongNumber][4]:
+		print("a")
 		pass
 	else:
 		if SongList[SongNumber][2] == "mp3":
+			print("b")
 			Mp3Metadata.OpenFile(SongList[SongNumber][1])
 			SongList[SongNumber][4] = Mp3Metadata.SongInfo
+		elif SongList[SongNumber][2] == "flac":
+			print("c")
+			FlacMetadata.OpenFile(SongList[SongNumber][1])
+			print("d")
+			SongList[SongNumber][4] = FlacMetadata.SongInfo
+			print("e")
 	print(SongList[SongNumber][4])#.get("TIT2"))
 	
 	$SongPlayer.stream = MusicStream
@@ -217,12 +226,16 @@ func LoadSong(SongNumber: int, Forward: bool):
 		DiscordRPC.small_image_text = "Volume: " + str($Controls/VolumeSlider.value)
 		DiscordRPC.refresh()
 
-func GetMetaMp3():
+func GetMeta():
 	for Song in SongList:
 		if Song:
 			if Song[2] == "mp3":
 				Mp3Metadata.OpenFile(Song[1])
 				SongList[Song[3]][4] = Mp3Metadata.SongInfo
+			elif Song[2] == "flac":
+				FlacMetadata.OpenFile(Song[1])
+				SongList[Song[3]][4] = FlacMetadata.SongInfo
+			print(SongList[Song[3]][4])
 		#print(Mp3Metadata.SongInfo)
 	call_deferred("SongListName")
 	#if call_deferred("get_node_or_null","SongList"):
@@ -441,7 +454,7 @@ func _on_folder_select_dir_selected(dir):
 		DiscordRPC.refresh()
 	
 	MetadataThread = Thread.new()
-	MetadataThread.start(GetMetaMp3)
+	MetadataThread.start(GetMeta)
 
 
 func _on_clear_list_pressed():
@@ -481,3 +494,5 @@ func _on_loop_pressed():
 		Loop = LoopType.OFF
 		$Controls/Buttons/Loop.button_pressed = false
 		$Controls/Buttons/Loop/One.visible = false
+
+

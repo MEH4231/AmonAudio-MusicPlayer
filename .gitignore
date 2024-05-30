@@ -2,8 +2,8 @@
 .godot/
 CustomEditor/GodotEditorCustomLinux.x86_64
 CustomEditor/GodotEditorCustomWindows.exe
-CustomEditor/GodotTemplateCustomLinux.x86_64
-CustomEditor/GodotTemplateCustomWindows.exe
+CustomEditor/linux_release.x86_64
+CustomEditor/windows_release_x86_64.exe
 /TestMusic
 AmonAudio-MusicPlayer.exe
 AmonAudio-MusicPlayer.x86_64

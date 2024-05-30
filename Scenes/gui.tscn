@@ -203,13 +203,13 @@ text = "Select Folder"
 
 [node name="FolderSelect" type="FileDialog" parent="SelectSongs"]
 title = "Open a Directory"
-size = Vector2i(454, 159)
+position = Vector2i(375, 275)
+size = Vector2i(1142, 529)
 ok_button_text = "Select Current Folder"
 mode_overrides_title = false
 file_mode = 2
 access = 2
 show_hidden_files = true
-use_native_dialog = true
 
 [connection signal="finished" from="SongPlayer" to="." method="_on_song_player_finished"]
 [connection signal="item_activated" from="SongList" to="." method="_on_song_list_item_activated"]
