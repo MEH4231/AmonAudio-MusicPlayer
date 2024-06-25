@@ -152,22 +152,22 @@ func LoadSong(SongNumber: int, Forward: bool):
 	#print(File.get_buffer(128).get_string_from_ascii())
 	#if File[0] == 'I' and File[1] == 'D' and File[2] == '3':
 		#print("File")
-	print("bas")
-	if SongList[SongNumber][4]:
-		print("a")
-		pass
-	else:
-		if SongList[SongNumber][2] == "mp3":
-			print("b")
-			Mp3Metadata.OpenFile(SongList[SongNumber][1])
-			SongList[SongNumber][4] = Mp3Metadata.SongInfo
-		elif SongList[SongNumber][2] == "flac":
-			print("c")
-			FlacMetadata.OpenFile(SongList[SongNumber][1])
-			print("d")
-			SongList[SongNumber][4] = FlacMetadata.SongInfo
-			print("e")
-	print(SongList[SongNumber][4])#.get("TIT2"))
+	#print("bas")
+	#if SongList[SongNumber][4]:
+		#print("a")
+		#pass
+	#else:
+		#if SongList[SongNumber][2] == "mp3":
+			#print("b")
+			#Mp3Metadata.OpenFile(SongList[SongNumber][1])
+			#SongList[SongNumber][4] = Mp3Metadata.SongInfo
+		#elif SongList[SongNumber][2] == "flac":
+			#print("c")
+			#FlacMetadata.OpenFile(SongList[SongNumber][1])
+			#print("d")
+			#SongList[SongNumber][4] = FlacMetadata.SongInfo
+			#print("e")
+	#print(SongList[SongNumber][4])#.get("TIT2"))
 	
 	$SongPlayer.stream = MusicStream
 	$SongPlayer.play()
@@ -256,6 +256,7 @@ func GetMeta():
 	print("Done")
 
 func SongListName():
+	MetadataThread.wait_to_finish()
 	$SongList.clear()
 	for Song in SongList:
 		if Song[4]:

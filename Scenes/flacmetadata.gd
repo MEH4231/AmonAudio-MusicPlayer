@@ -53,7 +53,7 @@ func OpenFile(filepath):
 		#block_type = block_header[0] & 0x7F
 		#block_type = str(block_type).hex_decode().get_string_from_ascii()
 		#TITLE
-		block_type = file.get_buffer(4).get_string_from_ascii().to_lower()
+		block_type = file.get_buffer(1).get_string_from_ascii().to_lower()
 		#print(block_type)
 		if title == false:
 			if block_type == "t":
@@ -66,7 +66,7 @@ func OpenFile(filepath):
 							block_type = file.get_buffer(1).get_string_from_ascii().to_lower()
 							if block_type == "e":
 								file.get_buffer(1).get_string_from_ascii()
-								SongInfo["TIT2"] = file.get_buffer(64).get_string_from_ascii().strip_edges(false,true)
+								SongInfo["TIT2"] = file.get_buffer(1).get_string_from_ascii().strip_edges(false,true)
 								#print(SongInfo["TIT2"])
 								title = true
 							
@@ -83,7 +83,7 @@ func OpenFile(filepath):
 								block_type = file.get_buffer(1).get_string_from_ascii().to_lower()
 								if block_type == "t":
 									file.get_buffer(1).get_string_from_ascii()
-									SongInfo["TPE1"] = file.get_buffer(32).get_string_from_ascii().strip_edges(false,true)
+									SongInfo["TPE1"] = file.get_buffer(1).get_string_from_ascii().strip_edges(false,true)
 									#print(SongInfo["TPE1"])
 									artist = true
 		if (title == true and artist == true) or file.eof_reached():
