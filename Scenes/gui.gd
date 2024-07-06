@@ -19,14 +19,14 @@ var MetadataThread = Thread.new()
 func _ready():
 	print(Loop)
 	DiscordRPC.app_id = 1224614529456017498 # Application ID
-	DiscordRPC.details = "Playing music all night"
+	DiscordRPC.details = "Playing music"
 	DiscordRPC.state = "Nothing Playing"
 	#DiscordRPC.state = ""
 
 	DiscordRPC.large_image = "icon" # Image key from "Art Assets"
 	#DiscordRPC.large_image_text = "Try it now!"
 	DiscordRPC.small_image = "volume" # Image key from "Art Assets"
-	DiscordRPC.small_image_text = "Volume: " + str($Controls/VolumeSlider.value)
+	DiscordRPC.small_image_text = "Volume: " + str($Controls/VolumeSlider.value) + " | Shuffle: " + str(Shuffle).capitalize() + " | Loop: " + str(Loop)
 
 	#DiscordRPC.start_timestamp = int(Time.get_unix_time_from_system())
 	#DiscordRPC.end_timestamp = int(Time.get_unix_time_from_system()) + 3600 # +1 hour in unix time / "01:00:00 remaining"
@@ -35,7 +35,7 @@ func _ready():
 	#GetDirectories("C:/Users/XLR8/Music/")
 	#GetDirectories("/run/media/kirby/MoreStore/Music")
 	print(SongList.size())
-	DiscordRPC.details = "Playing " + str(SongList.size()) + " songs all night"
+	DiscordRPC.details = "Playing " + str(SongList.size()) + " songs"
 	DiscordRPC.refresh()
 	MetadataThread.start(GetMeta)
 	for Song in SongList:
@@ -86,7 +86,7 @@ func LoadSong(SongNumber: int, Forward: bool):
 		if Time.get_unix_time_from_system() > LastDiscordTime + 60:
 			DiscordRPC.clear(true)
 			DiscordRPC.app_id = 1224614529456017498
-			DiscordRPC.details = "Playing " + str(SongList.size()) + " songs all night"
+			DiscordRPC.details = "Playing " + str(SongList.size()) + " songs"
 			DiscordRPC.state = "Nothing Playing"
 			DiscordRPC.large_image = "icon"
 			DiscordRPC.small_image = "volume"
@@ -223,7 +223,7 @@ func LoadSong(SongNumber: int, Forward: bool):
 			DiscordRPC.large_image_text = PlayingSong[4].get("TPE1") + " - " + PlayingSong[4].get("TIT2")
 		else:
 			DiscordRPC.large_image_text = PlayingSong[0]
-		DiscordRPC.small_image_text = "Volume: " + str($Controls/VolumeSlider.value)
+		DiscordRPC.small_image_text = "Volume: " + str($Controls/VolumeSlider.value) + " | Shuffle: " + str(Shuffle).capitalize() + " | Loop: " + str(Loop)
 		DiscordRPC.refresh()
 
 func GetMeta():
@@ -276,7 +276,7 @@ func _on_volume_slider_gui_input(_event):
 	$Controls/VolumeSlider/Percent.text = str(($Controls/VolumeSlider.value)) + "%"
 	
 	if Discord == true:
-		DiscordRPC.small_image_text = "Volume: " + str($Controls/VolumeSlider.value)
+		DiscordRPC.small_image_text = "Volume: " + str($Controls/VolumeSlider.value) + " | Shuffle: " + str(Shuffle).capitalize() + " | Loop: " + str(Loop)
 		DiscordRPC.refresh()
 
 
@@ -285,6 +285,9 @@ func _on_song_player_finished():
 		$SongPlayer.seek(0)
 		$SongPlayer.play()
 		LastRefresh = snapped(-1, 1)
+	if Discord == true:
+		DiscordRPC.start_timestamp = int(Time.get_unix_time_from_system())
+		DiscordRPC.refresh()
 	else:
 		if Shuffle == true:
 			var random = RandomNumberGenerator.new()
@@ -400,6 +403,9 @@ func _on_back_pressed():
 
 func _on_shuffle_toggled(toggled_on):
 	Shuffle = toggled_on
+	if Discord == true:
+		DiscordRPC.small_image_text = "Volume: " + str($Controls/VolumeSlider.value) + " | Shuffle: " + str(Shuffle).capitalize() + " | Loop: " + str(Loop)
+		DiscordRPC.refresh()
 
 
 func _on_discord_toggled(toggled_on):
@@ -409,11 +415,11 @@ func _on_discord_toggled(toggled_on):
 	else:
 		DiscordRPC.clear(true)
 		DiscordRPC.app_id = 1224614529456017498
-		DiscordRPC.details = "Playing music all night"
+		DiscordRPC.details = "Playing music"
 		DiscordRPC.state = "Nothing Playing"
 		DiscordRPC.large_image = "icon"
 		DiscordRPC.small_image = "volume"
-		DiscordRPC.small_image_text = "Volume: " + str($Controls/VolumeSlider.value)
+		DiscordRPC.small_image_text = "Volume: " + str($Controls/VolumeSlider.value) + " | Shuffle: " + str(Shuffle).capitalize() + " | Loop: " + str(Loop)
 		if $SongPlayer.playing == true:
 			var time = snapped($SongPlayer.stream.get_length(),1)
 			var hours = (int(time) / 60) / 60
@@ -427,9 +433,9 @@ func _on_discord_toggled(toggled_on):
 				DiscordRPC.large_image_text = PlayingSong[4].get("TPE1") + " - " + PlayingSong[4].get("TIT2")
 			else:
 				DiscordRPC.large_image_text = PlayingSong[0]
-			DiscordRPC.small_image_text = "Volume: " + str($Controls/VolumeSlider.value)
+			DiscordRPC.small_image_text = "Volume: " + str($Controls/VolumeSlider.value) + " | Shuffle: " + str(Shuffle).capitalize() + " | Loop: " + str(Loop)
 		if SongList.size() > 0:
-			DiscordRPC.details = "Playing " + str(SongList.size()) + " songs all night"
+			DiscordRPC.details = "Playing " + str(SongList.size()) + " songs"
 		DiscordRPC.refresh()
 
 
@@ -451,7 +457,7 @@ func _on_folder_select_dir_selected(dir):
 	print(SongList.size())
 	
 	if Discord == true:
-		DiscordRPC.details = "Playing " + str(SongList.size()) + " songs all night"
+		DiscordRPC.details = "Playing " + str(SongList.size()) + " songs"
 		DiscordRPC.refresh()
 	
 	MetadataThread = Thread.new()
@@ -475,7 +481,7 @@ func _on_clear_list_pressed():
 	$Controls/TimeLeft.value = 0
 	
 	if Discord == true:
-		DiscordRPC.details = "Playing music all night"
+		DiscordRPC.details = "Playing music"
 		DiscordRPC.state = "Nothing Playing"
 		DiscordRPC.start_timestamp = int()
 		DiscordRPC.large_image_text = ""
@@ -495,5 +501,12 @@ func _on_loop_pressed():
 		Loop = LoopType.OFF
 		$Controls/Buttons/Loop.button_pressed = false
 		$Controls/Buttons/Loop/One.visible = false
+	if Discord == true:
+		DiscordRPC.small_image_text = "Volume: " + str($Controls/VolumeSlider.value) + " | Shuffle: " + str(Shuffle).capitalize() + " | Loop: " + str(Loop)
+		DiscordRPC.refresh()
 
 
+
+
+func _on_quit_pressed():
+	get_tree().quit()

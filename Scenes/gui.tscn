@@ -74,7 +74,7 @@ text = "70%"
 layout_mode = 0
 offset_left = 3.0
 offset_top = 3.0
-offset_right = 105.0
+offset_right = 730.0
 offset_bottom = 26.0
 text = "None playing"
 
@@ -211,6 +211,14 @@ file_mode = 2
 access = 2
 show_hidden_files = true
 
+[node name="Quit" type="Button" parent="."]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 9.0
+offset_right = 50.0
+offset_bottom = 40.0
+text = "Quit"
+
 [connection signal="finished" from="SongPlayer" to="." method="_on_song_player_finished"]
 [connection signal="item_activated" from="SongList" to="." method="_on_song_list_item_activated"]
 [connection signal="item_activated" from="History" to="." method="_on_history_item_activated"]
@@ -228,3 +236,4 @@ show_hidden_files = true
 [connection signal="pressed" from="ClearList" to="." method="_on_clear_list_pressed"]
 [connection signal="pressed" from="SelectSongs" to="." method="_on_select_songs_pressed"]
 [connection signal="dir_selected" from="SelectSongs/FolderSelect" to="." method="_on_folder_select_dir_selected"]
+[connection signal="pressed" from="Quit" to="." method="_on_quit_pressed"]
