@@ -12,31 +12,33 @@ enum LoopType{
 	SINGLE
 }
 
-var Discord = true
+var Remove = false
+var Discord = false
 
 var MetadataThread = Thread.new()
 
 func _ready():
 	print(Loop)
-	DiscordRPC.app_id = 1224614529456017498 # Application ID
-	DiscordRPC.details = "Playing music"
-	DiscordRPC.state = "Nothing Playing"
-	#DiscordRPC.state = ""
+	if Discord == true:
+		DiscordRPC.app_id = 1224614529456017498 # Application ID
+		DiscordRPC.details = "Playing music"
+		DiscordRPC.state = "Nothing Playing"
+		#DiscordRPC.state = ""
 
-	DiscordRPC.large_image = "icon" # Image key from "Art Assets"
-	#DiscordRPC.large_image_text = "Try it now!"
-	DiscordRPC.small_image = "volume" # Image key from "Art Assets"
-	DiscordRPC.small_image_text = "Volume: " + str($Controls/VolumeSlider.value) + " | Shuffle: " + str(Shuffle).capitalize() + " | Loop: " + str(Loop)
+		DiscordRPC.large_image = "icon" # Image key from "Art Assets"
+		#DiscordRPC.large_image_text = "Try it now!"
+		DiscordRPC.small_image = "volume" # Image key from "Art Assets"
+		DiscordRPC.small_image_text = "Volume: " + str($Controls/VolumeSlider.value) + " | Shuffle: " + str(Shuffle).capitalize() + " | Loop: " + str(Loop)
 
-	#DiscordRPC.start_timestamp = int(Time.get_unix_time_from_system())
-	#DiscordRPC.end_timestamp = int(Time.get_unix_time_from_system()) + 3600 # +1 hour in unix time / "01:00:00 remaining"
-	DiscordRPC.refresh()
+		#DiscordRPC.start_timestamp = int(Time.get_unix_time_from_system())
+		#DiscordRPC.end_timestamp = int(Time.get_unix_time_from_system()) + 3600 # +1 hour in unix time / "01:00:00 remaining"
+		DiscordRPC.refresh()
+		DiscordRPC.details = "Playing " + str(SongList.size()) + " songs"
+		DiscordRPC.refresh()
 	#GetDirectories("C:/Users/XLR8/Documents/Godot/projects/AmonAudio-MusicPlayer/TestMusic")
 	#GetDirectories("C:/Users/XLR8/Music/")
 	#GetDirectories("/run/media/kirby/MoreStore/Music")
 	print(SongList.size())
-	DiscordRPC.details = "Playing " + str(SongList.size()) + " songs"
-	DiscordRPC.refresh()
 	MetadataThread.start(GetMeta)
 	for Song in SongList:
 		$SongList.add_item(Song[0])
@@ -60,20 +62,31 @@ func GetDirectories(Path: String):
 	var Dir = DirAccess.open(Path)
 	if Dir.get_directories():
 		for Directory in Dir.get_directories():
-			#print(Path + "/" + Directory)
 			GetDirectories(Path + "/" + Directory)
 	if Dir.get_files():
 		for File in Dir.get_files():
 			if File.get_extension() == "mp3" or File.get_extension() == "flac":
-				#print(File)
 				var NewFile = File.erase(File.length() - (File.get_extension().length() + 1),File.get_extension().length() + 1)
-				#print(NewFile)
 				SongList.append([NewFile, Path + "/" + File, File.get_extension(), SongList.size(),{}])
-				#print(File.get_extension())0
-				#if File.ends_with(".mp3"):
-					#SongList.append([File, Path + "/" + File, "mp3", SongList.size()])
-				#elif File.ends_with(".flac"):
-					#SongList.append([File, Path + "/" + File, "flac", SongList.size()])
+			elif File.get_extension() == "AA-MP":
+				var PlaylistFile = FileAccess.open(Path + "/" + File,FileAccess.READ)
+				var PlayListSongs = str_to_var(PlaylistFile.get_as_text())
+				for Song in PlayListSongs:
+					if Song.get_extension() == "mp3" or Song.get_extension() == "flac":
+						var NewFile = Song.erase(Song.length() - (Song.get_extension().length() + 1),Song.get_extension().length() + 1)
+						SongList.append([NewFile, Song, Song.get_extension(), SongList.size(),{}])
+
+func GetSong(Path: String):
+	if Path.get_extension() == "mp3" or Path.get_extension() == "flac":
+		var NewFile = Path.erase(Path.length() - (Path.get_extension().length() + 1),Path.get_extension().length() + 1)
+		SongList.append([NewFile, Path, Path.get_extension(), SongList.size(),{}])
+	elif Path.get_extension() == "AA-MP":
+		var PlaylistFile = FileAccess.open(Path,FileAccess.READ)
+		var PlayListSongs = str_to_var(PlaylistFile.get_as_text())
+		for Song in PlayListSongs:
+			if Song.get_extension() == "mp3" or Song.get_extension() == "flac":
+				var NewFile = Song.erase(Song.length() - (Song.get_extension().length() + 1),Song.get_extension().length() + 1)
+				SongList.append([NewFile, Song, Song.get_extension(), SongList.size(),{}])
 
 
 func _on_song_list_item_activated(index):
@@ -121,7 +134,6 @@ func LoadSong(SongNumber: int, Forward: bool):
 			DiscordRPC.refresh()
 		if Loop == LoopType.ON:
 			LoadSong(0, true)
-			#LastRefresh = snapped(-1, 1)
 		return
 	var SelectedSong = SongList[SongNumber].duplicate()
 	var MusicStream
@@ -135,39 +147,6 @@ func LoadSong(SongNumber: int, Forward: bool):
 		MusicStream.data = Song.get_buffer(Song.get_length())
 	else:
 		return
-	
-	#var File = FileAccess.open(SelectedSong[1],FileAccess.READ)
-	#File.seek_end(-128)
-	#File = File.slice(0, File.size() - 2).size()
-	#var NewFile = PackedByteArray()
-	#var i = 0
-	#for Byte in File:
-		#i += 1
-		#if i < 128:#File.size() - 128:
-			#NewFile.append(Byte)
-	#print(NewFile)
-	
-	#var File = FileAccess.open(SelectedSong[1],FileAccess.READ)
-	#File = File.get_buffer(3).get_string_from_ascii()
-	#print(File.get_buffer(128).get_string_from_ascii())
-	#if File[0] == 'I' and File[1] == 'D' and File[2] == '3':
-		#print("File")
-	#print("bas")
-	#if SongList[SongNumber][4]:
-		#print("a")
-		#pass
-	#else:
-		#if SongList[SongNumber][2] == "mp3":
-			#print("b")
-			#Mp3Metadata.OpenFile(SongList[SongNumber][1])
-			#SongList[SongNumber][4] = Mp3Metadata.SongInfo
-		#elif SongList[SongNumber][2] == "flac":
-			#print("c")
-			#FlacMetadata.OpenFile(SongList[SongNumber][1])
-			#print("d")
-			#SongList[SongNumber][4] = FlacMetadata.SongInfo
-			#print("e")
-	#print(SongList[SongNumber][4])#.get("TIT2"))
 	
 	$SongPlayer.stream = MusicStream
 	$SongPlayer.play()
@@ -185,8 +164,6 @@ func LoadSong(SongNumber: int, Forward: bool):
 		if Song[4]:
 			if Song[4].get("TPE1") and Song[4].get("TIT2"):
 				$History.add_item(Song[4].get("TPE1") + " - " + Song[4].get("TIT2"))
-				#if call_deferred("get_node_or_null","SongList"):
-					#$SongList.add_item(Song[4].get("TIT2") + " - " + Song[4].get("TPE1"))
 			else:
 				$History.add_item(Song[0])
 		else:
@@ -197,7 +174,6 @@ func LoadSong(SongNumber: int, Forward: bool):
 	$Controls/Buttons/Container/Play.texture_normal = ResourceLoader.load("res://Textures/Pause.png")
 	$SongList.select(SongNumber)
 	$SongList.ensure_current_is_visible()
-	#$Controls/SongName.text = SelectedSong[0]
 	if PlayingSong[4].get("TIT2") and PlayingSong[4].get("TPE1"):
 		$Controls/SongName.text = PlayingSong[4].get("TPE1") + " - " + PlayingSong[4].get("TIT2")
 	else:
@@ -211,14 +187,9 @@ func LoadSong(SongNumber: int, Forward: bool):
 	var secs = int(time)
 	$Controls/TimeLeft/Length.text = (str(hours) + "h " + str(mins) + "m " + str(secs) + "s")
 	
-	#DiscordRPC.clear(true)
-	#DiscordRPC.app_id = 1224614529456017498
-	#DiscordRPC.large_image = "icon"
-	#DiscordRPC.small_image = "volume"
 	if Discord == true:
 		DiscordRPC.state = "Total: "+ (str(hours) + "h " + str(mins) + "m " + str(secs) + "s")
 		DiscordRPC.start_timestamp = int(Time.get_unix_time_from_system())
-		#DiscordRPC.large_image_text = SelectedSong[0]
 		if PlayingSong[4].get("TIT2") and PlayingSong[4].get("TPE1"):
 			DiscordRPC.large_image_text = PlayingSong[4].get("TPE1") + " - " + PlayingSong[4].get("TIT2")
 		else:
@@ -236,23 +207,7 @@ func GetMeta():
 				FlacMetadata.OpenFile(Song[1])
 				SongList[Song[3]][4] = FlacMetadata.SongInfo
 			print(SongList[Song[3]][4])
-		#print(Mp3Metadata.SongInfo)
 	call_deferred("SongListName")
-	#if call_deferred("get_node_or_null","SongList"):
-		#$SongList.clear()
-		#return
-	#for Song in SongList:
-		#print(Song[0])
-		#if Song[4]:
-			#print("a")
-			#if Song[4].get("TIT2") and Song[4].get("TPE1"):
-				#print(Song[4].get("TIT2") + " - " + Song[4].get("TPE1"))
-				#SongListName(Song[4].get("TIT2") + " - " + Song[4].get("TPE1"))
-				##if call_deferred("get_node_or_null","SongList"):
-					##$SongList.add_item(Song[4].get("TIT2") + " - " + Song[4].get("TPE1"))
-		#else:
-			#print("b")
-			#$SongList.add_item(Song[0])
 	print("Done")
 
 func SongListName():
@@ -262,8 +217,6 @@ func SongListName():
 		if Song[4]:
 			if Song[4].get("TPE1") and Song[4].get("TIT2"):
 				$SongList.add_item(Song[4].get("TPE1") + " - " + Song[4].get("TIT2"))
-				#if call_deferred("get_node_or_null","SongList"):
-					#$SongList.add_item(Song[4].get("TIT2") + " - " + Song[4].get("TPE1"))
 			else:
 				$SongList.add_item(Song[0])
 		else:
@@ -445,23 +398,11 @@ func _on_history_item_activated(index):
 	LoadSong(SongToPlay, true)
 
 
+func _on_select_folder_pressed():
+	$RightButtons/SelectFolder/FolderSelect.visible = true
+
 func _on_select_songs_pressed():
-	$SelectSongs/FolderSelect.visible = true
-
-
-func _on_folder_select_dir_selected(dir):
-	GetDirectories(dir)
-	$SongList.clear()
-	for Song in SongList:
-		$SongList.add_item(Song[0])
-	print(SongList.size())
-	
-	if Discord == true:
-		DiscordRPC.details = "Playing " + str(SongList.size()) + " songs"
-		DiscordRPC.refresh()
-	
-	MetadataThread = Thread.new()
-	MetadataThread.start(GetMeta)
+	$RightButtons/SelectSongs/SongSelect.visible = true
 
 
 func _on_clear_list_pressed():
@@ -510,3 +451,79 @@ func _on_loop_pressed():
 
 func _on_quit_pressed():
 	get_tree().quit()
+
+
+func _on_folder_select_dir_selected(dir):
+	GetDirectories(dir)
+	$SongList.clear()
+	for Song in SongList:
+		$SongList.add_item(Song[0])
+	print(SongList.size())
+	
+	if Discord == true:
+		DiscordRPC.details = "Playing " + str(SongList.size()) + " songs"
+		DiscordRPC.refresh()
+	
+	MetadataThread = Thread.new()
+	MetadataThread.start(GetMeta)
+
+func _on_song_select_file_selected(path):
+	GetSong(path)
+	$SongList.clear()
+	for Song in SongList:
+		$SongList.add_item(Song[0])
+	print(SongList.size())
+	
+	if Discord == true:
+		DiscordRPC.details = "Playing " + str(SongList.size()) + " songs"
+		DiscordRPC.refresh()
+	
+	MetadataThread = Thread.new()
+	MetadataThread.start(GetMeta)
+
+
+func _on_song_select_files_selected(paths):
+	for File in paths:
+		GetSong(File)
+	$SongList.clear()
+	for Song in SongList:
+		$SongList.add_item(Song[0])
+	print(SongList.size())
+	
+	if Discord == true:
+		DiscordRPC.details = "Playing " + str(SongList.size()) + " songs"
+		DiscordRPC.refresh()
+	
+	MetadataThread = Thread.new()
+	MetadataThread.start(GetMeta)
+
+
+func _on_remove_song_toggled(toggled_on):
+	Remove = toggled_on
+
+
+func _on_save_playlist_pressed():
+	$RightButtons/SavePlaylist/PlaylistSave.visible = true
+
+
+func _on_playlist_save_file_selected(path):
+	var File = FileAccess.open(path,FileAccess.WRITE)
+	var PlaylistSongs = []
+	for Song in SongList:
+		PlaylistSongs.append(Song[1])
+	print(PlaylistSongs)
+	File.store_string(str(PlaylistSongs))
+	File.close()
+
+
+func _on_song_list_item_clicked(index, at_position, mouse_button_index):
+	if Remove == true:
+		SongList.remove_at(index)
+		$SongList.remove_item(index)
+		print(SongList.size())
+		PreviousSongs.clear()
+		$History.clear()
+
+
+
+

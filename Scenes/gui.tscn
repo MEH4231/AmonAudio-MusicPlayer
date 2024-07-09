@@ -176,33 +176,42 @@ offset_bottom = 44.0
 scale = Vector2(0.8, 0.8)
 texture = ExtResource("10_bnngr")
 
-[node name="Discord" type="CheckButton" parent="."]
-layout_mode = 0
-offset_left = 1797.0
-offset_top = 33.0
-offset_right = 1904.0
-offset_bottom = 64.0
-button_pressed = true
-text = "Discord"
+[node name="RightButtons" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -155.0
+offset_top = 5.0
+offset_right = -2.0
+offset_bottom = 342.0
+grow_horizontal = 0
+theme_override_constants/separation = 20
 
-[node name="ClearList" type="Button" parent="."]
-layout_mode = 0
-offset_left = 1786.0
-offset_top = 173.0
-offset_right = 1902.0
-offset_bottom = 204.0
+[node name="Quit" type="Button" parent="RightButtons"]
+layout_mode = 2
+text = "Quit"
+
+[node name="Discord" type="CheckButton" parent="RightButtons"]
+layout_mode = 2
+text = "Discord"
+alignment = 1
+
+[node name="RemoveSong" type="CheckButton" parent="RightButtons"]
+layout_mode = 2
+text = "Remove Song"
+alignment = 1
+
+[node name="ClearList" type="Button" parent="RightButtons"]
+layout_mode = 2
 text = "Clear song list"
 
-[node name="SelectSongs" type="Button" parent="."]
-layout_mode = 0
-offset_left = 1789.0
-offset_top = 238.0
-offset_right = 1896.0
-offset_bottom = 269.0
+[node name="SelectFolder" type="Button" parent="RightButtons"]
+layout_mode = 2
 text = "Select Folder"
 
-[node name="FolderSelect" type="FileDialog" parent="SelectSongs"]
-title = "Open a Directory"
+[node name="FolderSelect" type="FileDialog" parent="RightButtons/SelectFolder"]
+title = "Load a folder"
 position = Vector2i(375, 275)
 size = Vector2i(1142, 529)
 ok_button_text = "Select Current Folder"
@@ -211,16 +220,37 @@ file_mode = 2
 access = 2
 show_hidden_files = true
 
-[node name="Quit" type="Button" parent="."]
-layout_mode = 0
-offset_left = 8.0
-offset_top = 9.0
-offset_right = 50.0
-offset_bottom = 40.0
-text = "Quit"
+[node name="SelectSongs" type="Button" parent="RightButtons"]
+layout_mode = 2
+text = "Select Songs"
+
+[node name="SongSelect" type="FileDialog" parent="RightButtons/SelectSongs"]
+title = "Load a folder"
+position = Vector2i(375, 275)
+size = Vector2i(1142, 529)
+ok_button_text = "Open"
+mode_overrides_title = false
+file_mode = 1
+access = 2
+show_hidden_files = true
+
+[node name="SavePlaylist" type="Button" parent="RightButtons"]
+layout_mode = 2
+text = "Save to Playlist"
+
+[node name="PlaylistSave" type="FileDialog" parent="RightButtons/SavePlaylist"]
+title = "Save a Playlist"
+position = Vector2i(375, 275)
+size = Vector2i(1142, 529)
+ok_button_text = "Save Playlist"
+mode_overrides_title = false
+access = 2
+filters = PackedStringArray("*.AA-MP")
+show_hidden_files = true
 
 [connection signal="finished" from="SongPlayer" to="." method="_on_song_player_finished"]
 [connection signal="item_activated" from="SongList" to="." method="_on_song_list_item_activated"]
+[connection signal="item_clicked" from="SongList" to="." method="_on_song_list_item_clicked"]
 [connection signal="item_activated" from="History" to="." method="_on_history_item_activated"]
 [connection signal="gui_input" from="Controls" to="." method="_on_controls_gui_input"]
 [connection signal="gui_input" from="Controls/VolumeSlider" to="." method="_on_volume_slider_gui_input"]
@@ -232,8 +262,14 @@ text = "Quit"
 [connection signal="pressed" from="Controls/Buttons/Container/Forward" to="." method="_on_forward_pressed"]
 [connection signal="toggled" from="Controls/Buttons/Shuffle" to="." method="_on_shuffle_toggled"]
 [connection signal="pressed" from="Controls/Buttons/Loop" to="." method="_on_loop_pressed"]
-[connection signal="toggled" from="Discord" to="." method="_on_discord_toggled"]
-[connection signal="pressed" from="ClearList" to="." method="_on_clear_list_pressed"]
-[connection signal="pressed" from="SelectSongs" to="." method="_on_select_songs_pressed"]
-[connection signal="dir_selected" from="SelectSongs/FolderSelect" to="." method="_on_folder_select_dir_selected"]
-[connection signal="pressed" from="Quit" to="." method="_on_quit_pressed"]
+[connection signal="pressed" from="RightButtons/Quit" to="." method="_on_quit_pressed"]
+[connection signal="toggled" from="RightButtons/Discord" to="." method="_on_discord_toggled"]
+[connection signal="toggled" from="RightButtons/RemoveSong" to="." method="_on_remove_song_toggled"]
+[connection signal="pressed" from="RightButtons/ClearList" to="." method="_on_clear_list_pressed"]
+[connection signal="pressed" from="RightButtons/SelectFolder" to="." method="_on_select_folder_pressed"]
+[connection signal="dir_selected" from="RightButtons/SelectFolder/FolderSelect" to="." method="_on_folder_select_dir_selected"]
+[connection signal="pressed" from="RightButtons/SelectSongs" to="." method="_on_select_songs_pressed"]
+[connection signal="file_selected" from="RightButtons/SelectSongs/SongSelect" to="." method="_on_song_select_file_selected"]
+[connection signal="files_selected" from="RightButtons/SelectSongs/SongSelect" to="." method="_on_song_select_files_selected"]
+[connection signal="pressed" from="RightButtons/SavePlaylist" to="." method="_on_save_playlist_pressed"]
+[connection signal="file_selected" from="RightButtons/SavePlaylist/PlaylistSave" to="." method="_on_playlist_save_file_selected"]
