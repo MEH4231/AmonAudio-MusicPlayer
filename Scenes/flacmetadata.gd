@@ -20,6 +20,14 @@ func OpenFile(filepath):
 	artist = false
 	SongInfo = Dictionary()
 	file = FileAccess.open(filepath, FileAccess.READ)
+	#while true:
+		#print("AAA   " + str(file.get_16()))
+		#var size_bytes : String = file.get_buffer(24).hex_encode()
+		#var tag_size : int = 0
+		#tag_size = size_bytes.hex_to_int()
+		#print(tag_size)
+		#file.get_buffer(tag_size)
+		#continue
 	#if file.get_buffer(4).get_string_from_ascii() != "fLaC":
 		#print("Not a valid FLAC file.")
 		#return
@@ -65,6 +73,8 @@ func OpenFile(filepath):
 						if block_type == "l":
 							block_type = file.get_buffer(1).get_string_from_ascii().to_lower()
 							if block_type == "e":
+								#file.get_buffer(-8)
+								#print("AAA   " + str(file.get_32()))
 								file.get_buffer(1).get_string_from_ascii()
 								SongInfo["TIT2"] = METATEST(file)
 								#SongInfo["TIT2"] = file.get_buffer(16).get_string_from_ascii().strip_edges(false,true)
@@ -89,7 +99,7 @@ func OpenFile(filepath):
 									#print(SongInfo["TPE1"])
 									artist = true
 		if (title == true and artist == true) or file.eof_reached():
-			print(SongInfo)
+			#print(SongInfo)
 			return
 		
 		#print(block_type)

@@ -206,7 +206,7 @@ func GetMeta():
 			elif Song[2] == "flac":
 				FlacMetadata.OpenFile(Song[1])
 				SongList[Song[3]][4] = FlacMetadata.SongInfo
-			print(SongList[Song[3]][4])
+			#print(SongList[Song[3]][4])
 	call_deferred("SongListName")
 	print("Done")
 
@@ -238,9 +238,9 @@ func _on_song_player_finished():
 		$SongPlayer.seek(0)
 		$SongPlayer.play()
 		LastRefresh = snapped(-1, 1)
-	if Discord == true:
-		DiscordRPC.start_timestamp = int(Time.get_unix_time_from_system())
-		DiscordRPC.refresh()
+		if Discord == true:
+			DiscordRPC.start_timestamp = int(Time.get_unix_time_from_system())
+			DiscordRPC.refresh()
 	else:
 		if Shuffle == true:
 			var random = RandomNumberGenerator.new()
@@ -511,7 +511,7 @@ func _on_playlist_save_file_selected(path):
 	var PlaylistSongs = []
 	for Song in SongList:
 		PlaylistSongs.append(Song[1])
-	print(PlaylistSongs)
+	#print(PlaylistSongs)
 	File.store_string(str(PlaylistSongs))
 	File.close()
 
